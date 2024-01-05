@@ -1,6 +1,7 @@
 import NextAuth, { NextAuthOptions, Session } from "next-auth";
 import KeycloakProvider from "next-auth/providers/keycloak";
 import { jwtDecode } from "jwt-decode";
+import { encrypt } from '../../../../utils/encryption';
 
 const KEYCLOAK_CLIENT_ID = "appdemo";
 const KEYCLOAK_CLIENT_SECRET = "HM15Xe6OLhMBUFfM0hn0hHGHfipoBmXe";
@@ -34,9 +35,9 @@ const authOptions: NextAuthOptions = {
       return token
     },
     async session({ session, token }) {
-      session.access_token = token.access_token as string; // see utils/sessionTokenAccessor.js
-      session.refresh_token = token.access_token as string; // see utils/sessionTokenAccessor.js
-      session.id_token = token.id_token as string;  // see utils/sessionTokenAccessor.js
+      session.access_token = encrypt(token.access_token as string);
+      session.refresh_token = encrypt(token.access_token as string);
+      session.id_token = token.id_token as string;
       session.roles = (token.decoded as any).realm_access.roles as string[];
       session.error = token.error as string;
       return session;
